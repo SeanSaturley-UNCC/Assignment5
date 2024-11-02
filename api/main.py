@@ -145,3 +145,35 @@ def delete_one_recipe(recipe_id: int, db: Session = Depends(get_db)):
     if recipe is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
     return recipes.delete(db=db, recipe_id=recipe_id)
+
+
+
+# ORDER DETAILS API CODE
+@app.post("/order_details/", response_model=schemas.OrderDetail, tags=["Order Details"])
+def create_details(detail: schemas.OrderDetailCreate, db: Session = Depends(get_db)):
+    return order_details.create(db=db, detail=detail)
+
+@app.get("/order_details/", response_model=list[schemas.OrderDetail], tags=["Order Details"])
+def read_details(db: Session = Depends(get_db)):
+    return order_details.read_all(db)
+
+@app.get("/order_details/{detail_id}", response_model=schemas.OrderDetail, tags=["Order Details"])
+def read_one_detail(detail_id: int, db: Session = Depends(get_db)):
+    detail = order_details.read_one(db, detail_id=detail_id)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Details not found")
+    return detail
+
+@app.put("/order_details/{detail_id}", response_model=schemas.OrderDetail, tags=["Order Details"])
+def update_one_detail(detail_id: int, detail: schemas.OrderDetailUpdate, db: Session = Depends(get_db)):
+    db_details = order_details.read_one(db, detail_id=detail_id)
+    if db_details is None:
+        raise HTTPException(status_code=404, detail="Details not found")
+    return order_details.update(db=db, detail=detail, detail_id=detail_id)
+
+@app.delete("/order_details/{detail_id}", tags=["Order Details"])
+def delete_one_detail(detail_id: int, db: Session = Depends(get_db)):
+    detail = order_details.read_one(db, detail_id=detail_id)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="Details not found")
+    return order_details.delete(db=db, detail_id=detail_id)
